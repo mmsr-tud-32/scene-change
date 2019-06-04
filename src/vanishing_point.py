@@ -1,5 +1,6 @@
 import itertools
 import random
+import math
 from itertools import starmap
 
 import cv2
@@ -24,7 +25,9 @@ def hough_transform(img):
             hough_lines.extend(list(starmap(endpoints, line)))
 
     for line in hough_lines:
-        cv2.line(img, line[0], line[1], (0, 0, 255), 2)
+        angle = abs(math.degrees(math.atan2(line[0][0] - line[1][0], line[0][1] - line[1][1])))
+        if (angle >= 94 or angle <= 86) and angle >= 4 and (angle <= 176 or angle >= 184):
+            cv2.line(img, line[0], line[1], (0, 0, 255), 2)
 
     cv2.imwrite('pictures/output/hough.jpg', img)
     return hough_lines
