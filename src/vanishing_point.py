@@ -10,41 +10,47 @@ import numpy as np
 # Perform edge detection
 def hough_transform(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Convert image to grayscale
-    kernel = np.ones((10, 10), np.uint8)
+    gray = cv2.equalizeHist(gray)
+    cv2.imwrite('../pictures/output/gray.jpg', gray)
+    kernel = np.ones((5, 5), np.uint8)
+    gauss = cv2.GaussianBlur(gray, (5, 5), 0)
+    cv2.imwrite('../pictures/output/gauss.jpg', gauss)
 
-    opening = cv2.morphologyEx(gray, cv2.MORPH_OPEN, kernel)  # Open (erode, then dilate)
-    cv2.imwrite('pictures/output/opening.jpg', opening)
+    opening = cv2.morphologyEx(gauss, cv2.MORPH_OPEN, kernel)  # Open (erode, then dilate)
+    cv2.imwrite('../pictures/output/opening.jpg', opening)
     edges = cv2.Canny(opening, 40, 150, apertureSize=3)  # Canny edge detection
-    cv2.imwrite('pictures/output/canny.jpg', edges)
-    lines = cv2.HoughLines(edges, 1, np.pi / 180, 150)  # Hough line detection
+    cv2.imwrite('../pictures/output/canny.jpg', edges)
+    lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 150, 50, 50)  # Hough line detection
 
     hough_lines = []
     # Lines are represented by rho, theta; converted to endpoint notation
     if lines is not None:
         for line in lines:
-            hough_lines.extend(list(starmap(endpoints, line)))
+            length = math.sqrt(math.pow(line[0][0] - line[0][2], 2) + math.pow(line[0][1] - line[0][3], 2))
+            new_line = list([(line[0][0], line[0][1]), (line[0][2], line[0][3])])
+            angle = abs(math.degrees(math.atan2(new_line[0][0] - new_line[1][0], new_line[0][1] - new_line[1][1])))
+            if (angle >= 94 or angle <= 86) and angle >= 4 and (angle <= 176 or angle >= 184):
+                hough_lines.append(extend(new_line))
 
     for line in hough_lines:
-        angle = abs(math.degrees(math.atan2(line[0][0] - line[1][0], line[0][1] - line[1][1])))
-        if (angle >= 94 or angle <= 86) and angle >= 4 and (angle <= 176 or angle >= 184):
-            cv2.line(img, line[0], line[1], (0, 0, 255), 2)
+        cv2.line(img, line[0], line[1], (0, 0, 255), 2)
 
     cv2.imwrite('pictures/output/hough.jpg', img)
     return hough_lines
 
-
-def endpoints(rho, theta):
+def extend(line):
+    x1 = line[0][0]
+    y1 = line[0][1]
+    x2 = line[1][0]
+    y2 = line[1][1]
+    theta = abs(math.atan2(x1 - x2, y1 - y2))
     a = np.cos(theta)
     b = np.sin(theta)
-    x_0 = a * rho
-    y_0 = b * rho
-    x_1 = int(x_0 + 1000 * (-b))
-    y_1 = int(y_0 + 1000 * (a))
-    x_2 = int(x_0 - 1000 * (-b))
-    y_2 = int(y_0 - 1000 * (a))
-
-    return ((x_1, y_1), (x_2, y_2))
-
+    new_x1 = int(x1 + 1000 * (-b)) 
+    new_y1 = int(y1 + 1000 * a)
+    new_x2 = int(x2 - 1000 * (-b))
+    new_y2 = int(y2 - 1000 * a)
+    return list([(new_x1, new_y1), (new_x2, new_y2)])
 
 # Random sampling of lines
 def sample_lines(lines, size):
@@ -105,7 +111,7 @@ def find_vanishing_point(img, grid_size, intersections):
         cell_right = (j + 1) * grid_size
         cell_bottom = i * grid_size
         cell_top = (i + 1) * grid_size
-        cv2.rectangle(img, (cell_left, cell_bottom), (cell_right, cell_top), (0, 0, 255), 2)
+        # cv2.rectangle(img, (cell_left, cell_bottom), (cell_right, cell_top), (0, 0, 255), 2)
 
         current_intersections = 0  # Number of intersections in the current cell
         for x, y in intersections:

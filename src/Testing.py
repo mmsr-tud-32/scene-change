@@ -17,7 +17,7 @@ if filepath.endswith(".jpg"):
         intersections = find_intersections(random_sample)
         print(intersections)
         if intersections:
-            grid_size = min(img.shape[0], img.shape[1]) // 20
+            grid_size = min(img.shape[0], img.shape[1]) // 30
             vanishing_point = find_vanishing_point(img, grid_size, intersections)
             filename = '../pictures/output/center' + '.jpg'
             cv2.imwrite(filename, img)
