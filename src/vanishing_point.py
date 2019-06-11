@@ -101,10 +101,10 @@ def find_vanishing_point(img, grid_size, intersections):
     best_cell = (0.0, 0.0)
 
     for i, j in itertools.product(range(grid_rows), range(grid_columns)):
-        cell_left = i * grid_size
-        cell_right = (i + 1) * grid_size
-        cell_bottom = j * grid_size
-        cell_top = (j + 1) * grid_size
+        cell_left = j * grid_size
+        cell_right = (j + 1) * grid_size
+        cell_bottom = i * grid_size
+        cell_top = (i + 1) * grid_size
         cv2.rectangle(img, (cell_left, cell_bottom), (cell_right, cell_top), (0, 0, 255), 2)
 
         current_intersections = 0  # Number of intersections in the current cell
