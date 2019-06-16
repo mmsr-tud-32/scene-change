@@ -9,6 +9,12 @@ import numpy as np
 
 # Perform edge detection
 def hough_transform(img):
+    """
+    Detect lines in an image
+
+    :param img:
+    :return: List of lines
+    """
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Convert image to grayscale
     gray = cv2.equalizeHist(gray)
     cv2.imwrite('../pictures/output/gray.jpg', gray)
@@ -38,7 +44,14 @@ def hough_transform(img):
     cv2.imwrite('pictures/output/hough.jpg', img)
     return hough_lines
 
+
 def extend(line):
+    """
+    Extend a line to cover the entire image.
+
+    :param line: List[Tuple[Int, Int]]
+    :return:
+    """
     x1 = line[0][0]
     y1 = line[0][1]
     x2 = line[1][0]
@@ -46,11 +59,12 @@ def extend(line):
     theta = abs(math.atan2(x1 - x2, y1 - y2))
     a = np.cos(theta)
     b = np.sin(theta)
-    new_x1 = int(x1 + 1000 * (-b)) 
+    new_x1 = int(x1 + 1000 * (-b))
     new_y1 = int(y1 + 1000 * a)
     new_x2 = int(x2 - 1000 * (-b))
     new_y2 = int(y2 - 1000 * a)
     return list([(new_x1, new_y1), (new_x2, new_y2)])
+
 
 # Random sampling of lines
 def sample_lines(lines, size):
