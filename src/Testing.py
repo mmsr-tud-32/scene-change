@@ -13,8 +13,7 @@ if not hough_lines:
     print("No lines detected")
     exit(1)
 
-random_sample = sample_lines(hough_lines, 100)
-intersections = find_intersections(random_sample)
+intersections = find_intersections(hough_lines)
 
 if not intersections:
     print("No intersections detected")

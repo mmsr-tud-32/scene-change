@@ -35,8 +35,8 @@ def hough_transform(img):
             length = math.sqrt(math.pow(line[0][0] - line[0][2], 2) + math.pow(line[0][1] - line[0][3], 2))
             new_line = list([(line[0][0], line[0][1]), (line[0][2], line[0][3])])
             angle = abs(math.degrees(math.atan2(new_line[0][0] - new_line[1][0], new_line[0][1] - new_line[1][1])))
-            if (angle >= 94 or angle <= 86) and angle >= 4 and (angle <= 176 or angle >= 184):
-                hough_lines.append(extend(new_line))
+            # if (angle >= 94 or angle <= 86) and angle >= 4 and (angle <= 176 or angle >= 184):
+            hough_lines.append(extend(new_line))
 
     for line in hough_lines:
         cv2.line(img, line[0], line[1], (0, 0, 255), 2)
@@ -64,13 +64,6 @@ def extend(line):
     new_x2 = int(x2 - 1000 * (-b))
     new_y2 = int(y2 - 1000 * a)
     return list([(new_x1, new_y1), (new_x2, new_y2)])
-
-
-# Random sampling of lines
-def sample_lines(lines, size):
-    if size > len(lines):
-        size = len(lines)
-    return random.sample(lines, size)
 
 
 def det(a, b):
