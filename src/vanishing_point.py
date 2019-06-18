@@ -26,7 +26,7 @@ def hough_transform(img):
     cv2.imwrite('../pictures/output/opening.jpg', opening)
     edges = cv2.Canny(opening, 40, 150, apertureSize=3)  # Canny edge detection
     cv2.imwrite('../pictures/output/canny.jpg', edges)
-    lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 150, 50, 50)  # Hough line detection
+    lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 80, 30, 10)  # Hough line detection
 
     hough_lines = []
     # Lines are represented by rho, theta; converted to endpoint notation
@@ -40,7 +40,7 @@ def hough_transform(img):
     for line in hough_lines:
         cv2.line(img, line[0], line[1], (0, 0, 255), 2)
 
-    cv2.imwrite('pictures/output/hough.jpg', img)
+    cv2.imwrite('../pictures/output/hough.jpg', img)
     return hough_lines
 
 
