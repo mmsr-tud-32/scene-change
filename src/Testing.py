@@ -2,7 +2,7 @@ import sys
 
 import cv2
 
-from vanishing_point import hough_transform, find_intersections, sample_lines, find_vanishing_point
+from vanishing_point import hough_transform, find_intersections, find_vanishing_point
 
 filepath = sys.argv[1]
 
