@@ -11,6 +11,8 @@ hough_lines = hough_transform(img)
 
 if not hough_lines:
     print("No lines detected")
+    cv2.imshow('Canny', cv2.imread('../pictures/output/canny.jpg'))
+    cv2.waitKey(0)
     exit(1)
 
 intersections = find_intersections(hough_lines)
@@ -21,7 +23,7 @@ if not intersections:
 
 grid_size = min(img.shape[0], img.shape[1]) // 15
 vanishing_point = find_vanishing_point(img, grid_size, intersections)
-filename = '../pictures/output/center' + '.jpg'
+filename = '../pictures/output/center.jpg'
 cv2.imwrite(filename, img)
 cv2.imshow('image', img)
 cv2.waitKey(0)
