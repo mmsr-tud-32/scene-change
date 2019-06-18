@@ -33,7 +33,9 @@ def hough_transform(img):
     if lines is not None:
         for line in lines:
             new_line = list([(line[0][0], line[0][1]), (line[0][2], line[0][3])])
-            hough_lines.append(extend(new_line))
+            angle = abs(math.degrees(math.atan2(new_line[0][0] - new_line[1][0], new_line[0][1] - new_line[1][1])))
+            if (angle >= 94 or angle <= 86) and angle >= 4 and (angle <= 176 or angle >= 184):
+                hough_lines.append(extend(new_line))
 
     for line in hough_lines:
         cv2.line(img, line[0], line[1], (0, 0, 255), 2)
