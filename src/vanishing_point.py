@@ -32,10 +32,7 @@ def hough_transform(img):
     # Lines are represented by rho, theta; converted to endpoint notation
     if lines is not None:
         for line in lines:
-            length = math.sqrt(math.pow(line[0][0] - line[0][2], 2) + math.pow(line[0][1] - line[0][3], 2))
             new_line = list([(line[0][0], line[0][1]), (line[0][2], line[0][3])])
-            angle = abs(math.degrees(math.atan2(new_line[0][0] - new_line[1][0], new_line[0][1] - new_line[1][1])))
-            # if (angle >= 94 or angle <= 86) and angle >= 4 and (angle <= 176 or angle >= 184):
             hough_lines.append(extend(new_line))
 
     for line in hough_lines:
