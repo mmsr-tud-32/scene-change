@@ -8,24 +8,19 @@ import numpy as np
 
 
 # Perform edge detection
-def hough_transform(img):
+def hough_transform(img, save_output=True):
     """
     Detect lines in an image
 
     :param img:
+    :param save_output:
     :return: List of lines
     """
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Convert image to grayscale
-    gray = cv2.equalizeHist(gray)
-    cv2.imwrite('../pictures/output/gray.jpg', gray)
-    kernel = np.ones((5, 5), np.uint8)
-    gauss = cv2.GaussianBlur(gray, (5, 5), 0)
-    cv2.imwrite('../pictures/output/gauss.jpg', gauss)
 
-    opening = cv2.morphologyEx(gauss, cv2.MORPH_OPEN, kernel)  # Open (erode, then dilate)
-    cv2.imwrite('../pictures/output/opening.jpg', opening)
-    edges = cv2.Canny(opening, 40, 150, apertureSize=3)  # Canny edge detection
-    cv2.imwrite('../pictures/output/canny.jpg', edges)
+    grey = convert_to_greyscale(img, save_output)
+    gauss = apply_gaussian_blur(grey, save_output)
+    opening = create_opening(gauss, save_output)
+    edges = create_canny(opening, save_output)
     lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 80, 30, 10)  # Hough line detection
 
     hough_lines = []
@@ -42,6 +37,52 @@ def hough_transform(img):
 
     cv2.imwrite('../pictures/output/hough.jpg', img)
     return hough_lines
+
+def convert_to_greyscale(image, save_output=True):
+    """
+    Convert an image to greyscale
+    :param image:
+    :param save_output:
+    """
+    grey = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    grey = cv2.equalizeHist(grey)
+    if save_output:
+        cv2.imwrite('../pictures/output/grey.jpg', grey)
+    return grey
+
+def apply_gaussian_blur(image, save_output=True):
+    """
+    Apply a gaussian blur to an image
+    :param image:
+    :param save_output:
+    """
+    gauss = cv2.GaussianBlur(image, (5, 5), 0)
+    if save_output:
+        cv2.imwrite('../pictures/output/gauss.jpg', gauss)
+    return gauss
+
+def create_opening(image, save_output=True):
+    """
+    Create the opening for an image
+    :param image:
+    :param save_output:
+    """
+    kernel = np.ones((5, 5), np.uint8)
+    opening = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel)
+    if save_output:
+        cv2.imwrite('../pictures/output/opening.jpg', opening)
+    return opening
+
+def create_canny(image, save_output=True):
+    """
+    Create the canny for an image
+    :param image:
+    :param save_output:
+    """
+    edges = cv2.Canny(image, 40, 150, apertureSize=3)
+    if save_output:
+        cv2.imwrite('../pictures/output/canny.jpg', edges)
+    return edges
 
 def image_resize(image, resized_width = None, resized_height = None, inter = cv2.INTER_AREA):
     """
