@@ -43,6 +43,31 @@ def hough_transform(img):
     cv2.imwrite('../pictures/output/hough.jpg', img)
     return hough_lines
 
+def image_resize(image, width = None, height = None, inter = cv2.INTER_AREA):
+    """
+    Resize an image, keeping the ability to maintain the aspect ratio
+    :param image: The image to resize
+    :param width: The expected height of the image
+    :param height: The expected with of the image
+    :param inter: The interpolation mode
+    :return: The resized image
+    """
+    dimensions = None
+    (h, w) = image.shape[:2]
+
+    if width is None and height is None:
+        return image
+
+    if width is None:
+        r = height / float(h)
+        dimensions = (int(w * r), height)
+    elif height is None:
+        r = width / float(w)
+        dim = (width, int(h * r))
+    else:
+        dim = (width, height)
+
+    return cv2.resize(image, dim, interpolation = inter)
 
 def extend(line):
     """
