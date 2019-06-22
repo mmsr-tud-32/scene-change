@@ -20,12 +20,11 @@ def hough_transform(img, save_output=True):
     if lines is not None:
         transformed = [transform_line(line) for line in lines]
         filtered = [line for line in transformed if line is not None]
-        for line in filtered:
-            endpoints = calculate_endpoints(line, img)
-            hough_lines.append(endpoints)
+        hough_lines = filtered
 
     for line in hough_lines:
-        cv2.line(img, line[0], line[1], (0, 0, 255), 2)
+        endpoints = calculate_endpoints(line, img)
+        cv2.line(img, endpoints[0], endpoints[1], (0, 0, 255), 2)
 
     cv2.imwrite('../pictures/output/hough.jpg', img)
     return hough_lines
@@ -136,48 +135,25 @@ def image_resize(image, resized_width=None, resized_height=None, inter=cv2.INTER
     return cv2.resize(image, dimensions, interpolation=inter)
 
 
-def extend(line):
-    """
-    Extend a line to cover the entire image.
-
-    :param line: List[Tuple[Int, Int]]
-    :return:
-    """
-    x1 = line[0][0]
-    y1 = line[0][1]
-    x2 = line[1][0]
-    y2 = line[1][1]
-    theta = abs(np.arctan2(x1 - x2, y1 - y2))
-    a = np.cos(theta)
-    b = np.sin(theta)
-    new_x1 = int(x1 + 1000 * (-b))
-    new_y1 = int(y1 + 1000 * a)
-    new_x2 = int(x2 - 1000 * (-b))
-    new_y2 = int(y2 - 1000 * a)
-    return list([(new_x1, new_y1), (new_x2, new_y2)])
-
-
-def det(a, b):
-    return a[0] * b[1] - a[1] * b[0]
-
-
-# Find intersection point of two lines (not segments!)
 def line_intersection(line1, line2):
-    x_diff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
-    y_diff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])
+    """
+    Find the intersection between two lines
 
-    div = det(x_diff, y_diff)
-    if div == 0:
-        return None  # Lines don't cross
+    :param line1:
+    :param line2:
+    :return: The x and y coordinates of the intersection, or None if the lines don't intersect
+    """
+    (slope_1, translation_1) = line1[:2]
+    (slope_2, translation_2) = line2[:2]
+    if slope_1 == slope_2:
+        return None
 
-    d = (det(*line1), det(*line2))
-    x = det(d, x_diff) / div
-    y = det(d, y_diff) / div
+    x_coord = (translation_1 - translation_2) / (slope_1 - slope_2)
+    y_coord = slope_1 * x_coord + translation_1
 
-    return x, y
+    return int(np.round(x_coord)), int(np.round(y_coord))
 
 
-# Find intersections between multiple lines (not line segments!)
 def find_intersections(lines):
     intersections = []
     for i, line_1 in enumerate(lines):
