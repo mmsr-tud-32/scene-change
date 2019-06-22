@@ -18,9 +18,11 @@ def hough_transform(img, save_output=True):
     lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 80, 30, 10)
     hough_lines = []
     if lines is not None:
-        transformed = [transform_line(line) for line in lines]
-        hough_lines = [line for line in transformed if line is not None]
+        transformed = {transform_line(line) for line in lines}
+        filtered = {line for line in transformed if line is not None}
+        hough_lines = list(filtered)
 
+    print(hough_lines)
     for line in hough_lines:
         endpoints = calculate_endpoints(line, img)
         cv2.line(img, endpoints[0], endpoints[1], (0, 0, 255), 2)
