@@ -19,8 +19,7 @@ def hough_transform(img, save_output=True):
     hough_lines = []
     if lines is not None:
         transformed = [transform_line(line) for line in lines]
-        filtered = [line for line in transformed if line is not None]
-        hough_lines = filtered
+        hough_lines = [line for line in transformed if line is not None]
 
     for line in hough_lines:
         endpoints = calculate_endpoints(line, img)
