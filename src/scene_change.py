@@ -18,11 +18,24 @@ def scene_change(foreground, background):
 
 
 def add_noise(image):
+    """
+    Add random noise to an image.
+
+    :param image:
+    :return:
+    """
     noisy = (255 * random_noise(image, mode='gaussian', var=0.0007)).astype(np.uint8)
     return noisy
 
 
 def add_blur(image, kernel_size=3):
+    """
+    Blur an image.
+
+    :param image:
+    :param kernel_size:
+    :return:
+    """
     kernel = np.ones((kernel_size, kernel_size), np.float32) / np.square(kernel_size)
     return cv2.filter2D(image, -1, kernel)
 
