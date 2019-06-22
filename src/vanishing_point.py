@@ -149,7 +149,7 @@ def find_intersection_point(line1, line2):
     if slope_1 == slope_2:
         return None
 
-    x_coord = - (translation_1 - translation_2) / (slope_1 - slope_2)
+    x_coord = (translation_2 - translation_1) / (slope_1 - slope_2)
     y_coord = slope_1 * x_coord + translation_1
 
     return int(np.round(x_coord)), int(np.round(y_coord))
