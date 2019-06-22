@@ -6,11 +6,11 @@
 
 For both the foreground and background images.
 
-1. Resize
-1. Hough transform to detect lines
-1. Sample lines
-1. Find intersections
-1. Add noise
+- [x] Resize
+- [x] Hough transform to detect lines
+- [x] Find intersections
+- [ ] Merge foreground and background
+- [ ] Add noise
 
 ### Align & scale foreground
 
