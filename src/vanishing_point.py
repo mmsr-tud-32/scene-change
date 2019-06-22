@@ -1,5 +1,4 @@
 import itertools
-import math
 import cv2
 import numpy as np
 
@@ -148,7 +147,7 @@ def extend(line):
     y1 = line[0][1]
     x2 = line[1][0]
     y2 = line[1][1]
-    theta = abs(math.atan2(x1 - x2, y1 - y2))
+    theta = abs(np.arctan2(x1 - x2, y1 - y2))
     a = np.cos(theta)
     b = np.sin(theta)
     new_x1 = int(x1 + 1000 * (-b))
