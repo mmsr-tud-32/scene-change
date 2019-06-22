@@ -109,7 +109,7 @@ def create_canny(image, save_output=True):
     return edges
 
 
-def image_resize(image, resized_width=None, resized_height=None, inter=cv2.INTER_AREA):
+def resize_image(image, resized_width=None, resized_height=None, inter=cv2.INTER_AREA):
     """
     Resize an image, keeping the ability to maintain the aspect ratio
     :param image: The image to resize

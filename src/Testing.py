@@ -2,11 +2,11 @@ import sys
 
 import cv2
 
-from vanishing_point import hough_transform, find_all_intersections, find_vanishing_point, image_resize
+from vanishing_point import hough_transform, find_all_intersections, find_vanishing_point, resize_image
 
 filepath = sys.argv[1]
 
-img = image_resize(cv2.imread(filepath), 512)
+img = resize_image(cv2.imread(filepath), 512)
 hough_lines = hough_transform(img)
 
 if not hough_lines:
