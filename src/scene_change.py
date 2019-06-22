@@ -40,6 +40,16 @@ def add_blur(image, kernel_size=3):
     return cv2.filter2D(image, -1, kernel)
 
 
+def mirror(image):
+    """
+    Mirror image.
+
+    :param image:
+    :return:
+    """
+    return cv2.flip(image, 1)
+
+
 def merge(foreground, background):
     merged = background
     for row_idx, row in enumerate(foreground):
