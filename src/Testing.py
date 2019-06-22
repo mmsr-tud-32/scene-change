@@ -17,11 +17,15 @@ if not hough_lines:
 
 intersections = find_all_intersections(hough_lines)
 
+for x,y in intersections:
+    print(x, y)
+    cv2.line(img, (x, y), (x, y), (0, 255, 0), 10)
+
 if not intersections:
     print("No intersections detected")
     exit(1)
 
-grid_size = min(img.shape[0], img.shape[1]) // 15
+grid_size = min(img.shape[0], img.shape[1]) // 10
 vanishing_point = find_vanishing_point(img, grid_size, intersections)
 filename = '../pictures/output/center.jpg'
 cv2.imwrite(filename, img)
