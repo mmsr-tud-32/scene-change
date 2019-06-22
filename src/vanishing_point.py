@@ -1,13 +1,9 @@
 import itertools
-import random
 import math
-from itertools import starmap
-
 import cv2
 import numpy as np
 
 
-# Perform edge detection
 def hough_transform(img, save_output=True):
     """
     Detect lines in an image
@@ -16,27 +12,54 @@ def hough_transform(img, save_output=True):
     :param save_output:
     :return: List of lines
     """
-
     grey = convert_to_greyscale(img, save_output)
     gauss = apply_gaussian_blur(grey, save_output)
     opening = create_opening(gauss, save_output)
     edges = create_canny(opening, save_output)
-    lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 80, 30, 10)  # Hough line detection
-
+    lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 80, 30, 10)
     hough_lines = []
-    # Lines are represented by rho, theta; converted to endpoint notation
     if lines is not None:
-        for line in lines:
-            new_line = list([(line[0][0], line[0][1]), (line[0][2], line[0][3])])
-            angle = abs(math.degrees(math.atan2(new_line[0][0] - new_line[1][0], new_line[0][1] - new_line[1][1])))
-            if (angle >= 94 or angle <= 86 and angle != 0):# and angle >= 4 and (angle <= 176 or angle >= 184):
-                hough_lines.append(extend(new_line))
+        transformed = [transform_line(line) for line in lines]
+        filtered = [line for line in transformed if line is not None]
+        for line in filtered:
+            endpoints = calculate_endpoints(line, img)
+            hough_lines.append(endpoints)
 
     for line in hough_lines:
         cv2.line(img, line[0], line[1], (0, 0, 255), 2)
 
     cv2.imwrite('../pictures/output/hough.jpg', img)
     return hough_lines
+
+
+def calculate_endpoints(line, image):
+    """
+    Calculate the endpoints which we can use to draw the line on the image
+    :param line:
+    :param image:
+    :return:
+    """
+    (slope, translation) = line[:2]
+    (height, width) = image.shape[:2]
+    return (0, int(np.round(translation))), (width, int(np.round(slope * width + translation)))
+
+
+def transform_line(line):
+    """
+    Transforms a line into an equation of its slope and its translation
+    y = slope * x + translation
+    :param line:
+    :return:
+    """
+    (x1, y1, x2, y2) = line[0][:4]
+    if x1 == x2:
+        return None
+    else:
+        slope = (y2 - y1) / (x2 - x1)
+
+    translation = y1 - (slope * x1)
+    return slope, translation
+
 
 def convert_to_greyscale(image, save_output=True):
     """
@@ -50,6 +73,7 @@ def convert_to_greyscale(image, save_output=True):
         cv2.imwrite('../pictures/output/grey.jpg', grey)
     return grey
 
+
 def apply_gaussian_blur(image, save_output=True):
     """
     Apply a gaussian blur to an image
@@ -60,6 +84,7 @@ def apply_gaussian_blur(image, save_output=True):
     if save_output:
         cv2.imwrite('../pictures/output/gauss.jpg', gauss)
     return gauss
+
 
 def create_opening(image, save_output=True):
     """
@@ -73,6 +98,7 @@ def create_opening(image, save_output=True):
         cv2.imwrite('../pictures/output/opening.jpg', opening)
     return opening
 
+
 def create_canny(image, save_output=True):
     """
     Create the canny for an image
@@ -84,7 +110,8 @@ def create_canny(image, save_output=True):
         cv2.imwrite('../pictures/output/canny.jpg', edges)
     return edges
 
-def image_resize(image, resized_width = None, resized_height = None, inter = cv2.INTER_AREA):
+
+def image_resize(image, resized_width=None, resized_height=None, inter=cv2.INTER_AREA):
     """
     Resize an image, keeping the ability to maintain the aspect ratio
     :param image: The image to resize
@@ -107,7 +134,8 @@ def image_resize(image, resized_width = None, resized_height = None, inter = cv2
     else:
         dimensions = (resized_width, resized_height)
 
-    return cv2.resize(image, dimensions, interpolation = inter)
+    return cv2.resize(image, dimensions, interpolation=inter)
+
 
 def extend(line):
     """
