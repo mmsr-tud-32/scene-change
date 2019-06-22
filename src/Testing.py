@@ -2,7 +2,7 @@ import sys
 
 import cv2
 
-from vanishing_point import hough_transform, find_intersections, find_vanishing_point, image_resize
+from vanishing_point import hough_transform, find_all_intersections, find_vanishing_point, image_resize
 
 filepath = sys.argv[1]
 
@@ -15,7 +15,7 @@ if not hough_lines:
     cv2.waitKey(0)
     exit(1)
 
-intersections = find_intersections(hough_lines)
+intersections = find_all_intersections(hough_lines)
 
 if not intersections:
     print("No intersections detected")

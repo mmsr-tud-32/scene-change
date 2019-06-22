@@ -135,7 +135,7 @@ def image_resize(image, resized_width=None, resized_height=None, inter=cv2.INTER
     return cv2.resize(image, dimensions, interpolation=inter)
 
 
-def line_intersection(line1, line2):
+def find_intersection_point(line1, line2):
     """
     Find the intersection between two lines
 
@@ -154,29 +154,37 @@ def line_intersection(line1, line2):
     return int(np.round(x_coord)), int(np.round(y_coord))
 
 
-def find_intersections(lines):
+def find_all_intersections(lines):
+    """
+    Find all intersections over all lines
+    :param lines:
+    :return:
+    """
     intersections = []
     for i, line_1 in enumerate(lines):
         for line_2 in lines[i + 1:]:
             if not line_1 == line_2:
-                intersection = line_intersection(line_1, line_2)
-                if intersection:  # If lines cross, then add
+                intersection = find_intersection_point(line_1, line_2)
+                if intersection:
                     intersections.append(intersection)
 
     return intersections
 
 
-# Given intersections, find the grid where most intersections occur and treat as vanishing point
 def find_vanishing_point(img, grid_size, intersections):
-    # Image dimensions
-    image_height = img.shape[0]
-    image_width = img.shape[1]
+    """
+    Find the vanishing point
+    
+    :param img:
+    :param grid_size:
+    :param intersections:
+    :return:
+    """
+    (image_height, image_width) = img.shape[:2]
 
-    # Grid dimensions
     grid_rows = (image_height // grid_size) + 1
     grid_columns = (image_width // grid_size) + 1
 
-    # Current cell with most intersection points
     max_intersections = 0
     best_cell = (0.0, 0.0)
 
