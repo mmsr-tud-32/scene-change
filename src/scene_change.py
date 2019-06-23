@@ -2,6 +2,7 @@ import argparse
 import numpy as np
 import cv2
 from skimage.util import random_noise
+from color_transfer import color_transfer
 
 
 def get_arguments():
@@ -86,8 +87,49 @@ def mirror(image):
     return cv2.flip(image, 1)
 
 
+def match_colors(background, foreground):
+    """
+    Match the colours between the background and the foreground, maintaining the alpha channel
+    of the foreground.
+
+    :param background:
+    :param foreground:
+    :return:
+    """
+    transfered_foreground = color_transfer(background, foreground)
+    return fix_alpha(foreground, transfered_foreground)
+
+
+def fix_alpha(with_alpha, without_alpha):
+    """
+    Given two of the same image, one with an alpha channel and one without, add the alpha
+    channel back into the image without, and return it.
+
+    :param with_alpha:
+    :param without_alpha:
+    :return:
+    """
+    alpha_added = with_alpha.copy()
+    for row_idx, row in enumerate(without_alpha):
+        for pixel_idx, pixel in enumerate(row):
+            if with_alpha[row_idx][pixel_idx][3] != 0:
+                alpha_added[row_idx][pixel_idx][:3] = pixel[:3]
+                # alpha_added[row_idx][pixel_idx][1] = pixel[1]
+                # alpha_added[row_idx][pixel_idx][2] = pixel[2]
+
+    return alpha_added
+
+
 def merge(foreground, background):
-    merged = background
+    """
+    Given a background and a foreground, place the foreground
+    on the background.
+
+    :param foreground:
+    :param background:
+    :return:
+    """
+    merged = background.copy()
     for row_idx, row in enumerate(foreground):
         for pixel_idx, pixel in enumerate(row):
             if pixel[3] == 0:
