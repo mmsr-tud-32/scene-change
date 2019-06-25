@@ -96,9 +96,7 @@ def match_colors(background, foreground):
     :param foreground:
     :return:
     """
-    foreground_without_alpha = foreground[:, :, :3]
-    print(foreground_without_alpha)
-    transfered_foreground = color_transfer(background, foreground_without_alpha)
+    transfered_foreground = color_transfer(background, foreground)
     return fix_alpha(foreground, transfered_foreground)
 
 
