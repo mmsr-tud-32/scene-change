@@ -26,9 +26,9 @@ def hough_transform(img, save_output=True):
     """
     grey = convert_to_greyscale(img, save_output)
     gauss = apply_gaussian_blur(grey, save_output)
-    opening = create_opening(gauss, save_output)
-    edges = create_canny(opening, save_output)
-    lines = cv2.HoughLinesP(edges, 2, np.pi / 160, 80, 30, 10)
+    opening = perform_opening(gauss, save_output)
+    edges = perform_canny(opening, save_output)
+    lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 80, 30, 10)
     hough_lines = []
     if lines is not None:
         transformed = {transform_line(line) for line in lines}
@@ -103,9 +103,9 @@ def apply_gaussian_blur(image, save_output=True):
     return gauss
 
 
-def create_opening(image, save_output=True):
+def perform_opening(image, save_output=True):
     """
-    Create the opening for an image
+    Perform an opening on the image, removing noise.
     :param image:
     :param save_output:
     """
@@ -116,9 +116,9 @@ def create_opening(image, save_output=True):
     return opening
 
 
-def create_canny(image, save_output=True):
+def perform_canny(image, save_output=True):
     """
-    Create the canny for an image
+    Perform the Canny edge detection
     :param image:
     :param save_output:
     """
