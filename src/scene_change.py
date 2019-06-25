@@ -126,16 +126,15 @@ def merge(foreground, background, offset=(0, 0)):
     """
     foreground = foreground.astype(float)
     background = background.astype(float)
-    alpha = foreground[:, :, [3, 3, 3]].astype(float)
-    alpha = alpha / 255
+    alpha = foreground[:, :, [3, 3, 3]].astype(float) / 255
     alpha = cv2.GaussianBlur(alpha, (11, 11), 0)
 
     foreground = foreground[:, :, :3]
     foreground = cv2.multiply(alpha, foreground)
     background = cv2.multiply(1.0 - alpha, background)
-    cv2.imshow('foreground', foreground/255)
+    cv2.imshow('foreground', foreground / 255)
     cv2.waitKey(0)
-    cv2.imshow('background', background/255)
+    cv2.imshow('background', background / 255)
     cv2.waitKey(0)
     merged = cv2.add(foreground, background) / 255
 
