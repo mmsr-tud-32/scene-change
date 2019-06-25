@@ -3,6 +3,14 @@ import cv2
 import numpy as np
 
 
+def vanishing_point(img, grid=15, save_output=False):
+    hough_lines = hough_transform(img, save_output=save_output)
+    intersections = find_all_intersections(hough_lines)
+    grid_size = min(img.shape[0], img.shape[1]) // grid
+
+    return find_vanishing_point(img, grid_size, intersections)
+
+
 def hough_transform(img, save_output=True):
     """
     Detect lines in an image
