@@ -124,22 +124,36 @@ def merge(foreground, background, offset=(0, 0)):
     :param background:
     :return:
     """
+    foreground = foreground.astype(float)
+    background = background.astype(float)
+    alpha = foreground[:, :, [3, 3, 3]].astype(float)
+    alpha = alpha / 255
+    alpha = cv2.GaussianBlur(alpha, (11, 11), 0)
 
-    x_offset, y_offset = offset
-    merged = background.copy()
-    (height, width, _) = merged.shape
-    for y_pos, row in enumerate(foreground):
-        if y_pos + y_offset >= height or y_pos + y_offset < 0:
-            continue
+    foreground = foreground[:, :, :3]
+    foreground = cv2.multiply(alpha, foreground)
+    background = cv2.multiply(1.0 - alpha, background)
+    cv2.imshow('foreground', foreground/255)
+    cv2.waitKey(0)
+    cv2.imshow('background', background/255)
+    cv2.waitKey(0)
+    merged = cv2.add(foreground, background) / 255
 
-        for x_pos, pixel in enumerate(row):
-            if x_pos + x_offset >= width or x_pos + x_offset < 0:
-                continue
-
-            if pixel[3] == 0:
-                continue
-
-            merged[y_pos + y_offset][x_pos + x_offset] = pixel[:3]
+    # x_offset, y_offset = offset
+    # merged = background.copy()
+    # (height, width, _) = merged.shape
+    # for y_pos, row in enumerate(foreground):
+    #     if y_pos + y_offset >= height or y_pos + y_offset < 0:
+    #         continue
+    #
+    #     for x_pos, pixel in enumerate(row):
+    #         if x_pos + x_offset >= width or x_pos + x_offset < 0:
+    #             continue
+    #
+    #         if pixel[3] == 0:
+    #             continue
+    #
+    #         merged[y_pos + y_offset][x_pos + x_offset] = pixel[:3]
 
     return merged
 
