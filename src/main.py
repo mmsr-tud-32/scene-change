@@ -20,8 +20,7 @@ def get_arguments():
 
 def composite_images(fg_path, bg_path):
 
-    for i in range(60):
-        fg_file = random.choice(glob(fg_path + '/*'))
+    for fg_file in glob(fg_path + '/*'):
         bg_file = random.choice(glob(bg_path + '/*'))
 
         foreground = resize_image(cv2.imread(fg_file, cv2.IMREAD_UNCHANGED), 512)
