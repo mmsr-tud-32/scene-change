@@ -110,11 +110,7 @@ def fix_alpha(with_alpha, without_alpha):
     :return:
     """
     alpha_added = with_alpha.copy()
-    for row_idx, row in enumerate(without_alpha):
-        for pixel_idx, pixel in enumerate(row):
-            if with_alpha[row_idx][pixel_idx][3] != 0:
-                alpha_added[row_idx][pixel_idx][:3] = pixel[:3]
-
+    alpha_added[:, :, :3] = without_alpha
     return alpha_added
 
 
