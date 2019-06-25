@@ -20,7 +20,7 @@ merged = merge(transfered_foreground, background)
 cv2.imshow('Merged', merged)
 cv2.waitKey(0)
 
-blurred = add_blur(merged, 3)
+blurred = add_blur(merged, 2)
 cv2.imshow('Blurred', blurred)
 cv2.waitKey(0)
 

@@ -96,7 +96,9 @@ def match_colors(background, foreground):
     :param foreground:
     :return:
     """
-    transfered_foreground = color_transfer(background, foreground)
+    foreground_without_alpha = foreground[:, :, :3]
+    print(foreground_without_alpha)
+    transfered_foreground = color_transfer(background, foreground_without_alpha)
     return fix_alpha(foreground, transfered_foreground)
 
 
@@ -114,8 +116,6 @@ def fix_alpha(with_alpha, without_alpha):
         for pixel_idx, pixel in enumerate(row):
             if with_alpha[row_idx][pixel_idx][3] != 0:
                 alpha_added[row_idx][pixel_idx][:3] = pixel[:3]
-                # alpha_added[row_idx][pixel_idx][1] = pixel[1]
-                # alpha_added[row_idx][pixel_idx][2] = pixel[2]
 
     return alpha_added
 
