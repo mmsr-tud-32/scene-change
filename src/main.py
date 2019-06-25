@@ -1,6 +1,7 @@
 import argparse
 import random
 from glob import glob
+from os.path import splitext, basename
 
 import cv2
 
@@ -18,16 +19,20 @@ def get_arguments():
 
 
 def composite_images(fg_path, bg_path):
-    while True:
+
+    for i in range(60):
         fg_file = random.choice(glob(fg_path + '/*'))
         bg_file = random.choice(glob(bg_path + '/*'))
 
         foreground = resize_image(cv2.imread(fg_file, cv2.IMREAD_UNCHANGED), 512)
+        foreground = foreground[0:-10, :]
         background = resize_image(cv2.imread(bg_file), 512)
         foreground = fit_foreground(background, foreground)
 
-        cv2.imshow('merged', merge(foreground, background))
-        cv2.waitKey(0)
+        merged = merge(foreground, background)
+        fg = splitext(basename(fg_file))[0]
+        bg = splitext(basename(bg_file))[0]
+        cv2.imwrite('output/merged_{}__{}.jpg'.format(fg, bg), merged * 255)
 
 
 def fit_foreground(background, foreground):
