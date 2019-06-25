@@ -1,6 +1,11 @@
 import itertools
 import cv2
+import math
 import numpy as np
+import pandas as pd
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+from scipy.spatial.distance import cdist
 
 
 def vanishing_point(img, grid=15, save_output=False):
@@ -8,7 +13,7 @@ def vanishing_point(img, grid=15, save_output=False):
     intersections = find_all_intersections(hough_lines)
     grid_size = min(img.shape[0], img.shape[1]) // grid
 
-    return find_vanishing_point(img, grid_size, intersections)
+    return find_vanishing_point_kmeans(img, intersections)
 
 
 def hough_transform(img, save_output=True):
@@ -23,7 +28,7 @@ def hough_transform(img, save_output=True):
     gauss = apply_gaussian_blur(grey, save_output)
     opening = create_opening(gauss, save_output)
     edges = create_canny(opening, save_output)
-    lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 80, 30, 10)
+    lines = cv2.HoughLinesP(edges, 2, np.pi / 160, 80, 30, 10)
     hough_lines = []
     if lines is not None:
         transformed = {transform_line(line) for line in lines}
@@ -35,7 +40,7 @@ def hough_transform(img, save_output=True):
         cv2.line(partial_lines, (line[0][0], line[0][1]), (line[0][2], line[0][3]), (0, 0, 255), 2)
 
     cv2.imwrite('../pictures/output/partial.jpg', partial_lines)
-    full_lines = img.copy()
+    full_lines = img  # .copy()
     for line in hough_lines:
         endpoints = calculate_endpoints(line, full_lines)
         cv2.line(full_lines, endpoints[0], endpoints[1], (0, 0, 255), 1)
@@ -64,7 +69,7 @@ def transform_line(line):
     :return:
     """
     (x1, y1, x2, y2) = line[0][:4]
-    if x1 == x2:
+    if x1 == x2 or y1 == y2:
         return None
     else:
         slope = (y2 - y1) / (x2 - x1)
@@ -183,6 +188,37 @@ def find_all_intersections(lines):
                     intersections.append(intersection)
 
     return intersections
+
+
+def find_vanishing_point_kmeans(img, intersections):
+    df = pd.DataFrame(intersections, columns=['x', 'y'])
+
+    kmeans = KMeans(n_clusters=20).fit(df)
+    centroids = kmeans.cluster_centers_
+    cluster_map = pd.DataFrame()
+    cluster_map['data_index'] = df.index.values
+    cluster_map['cluster'] = kmeans.labels_
+
+    largest = 0
+    largest_centroid = (0, 0)
+    for c in centroids:
+        points = df[df.apply(
+            lambda row: math.hypot(c[0] - row["x"], (c[1]- row["y"])) < 15, axis=1) == True]
+        if len(points) > largest:
+            largest = len(points)
+            largest_centroid = c
+
+    print(largest_centroid)
+    plt.scatter(df['x'], df['y'], c=kmeans.labels_.astype(float), s=5, alpha=0.5)
+    plt.scatter(centroids[:, 0], centroids[:, 1], c='red', s=5)
+    plt.show()
+
+    x = int(largest_centroid[0])
+    y = int(largest_centroid[1])
+
+    cv2.line(img, (x, y), (x, y), (0, 255, 0), 20)
+
+    return x, y
 
 
 def find_vanishing_point(img, grid_size, intersections):
