@@ -39,13 +39,14 @@ def hough_transform(img, save_output=True):
     for line in lines:
         cv2.line(partial_lines, (line[0][0], line[0][1]), (line[0][2], line[0][3]), (0, 0, 255), 2)
 
-    cv2.imwrite('../pictures/output/partial.jpg', partial_lines)
     full_lines = img  # .copy()
     for line in hough_lines:
         endpoints = calculate_endpoints(line, full_lines)
         cv2.line(full_lines, endpoints[0], endpoints[1], (0, 0, 255), 1)
 
-    cv2.imwrite('../pictures/output/hough.jpg', full_lines)
+    save_image('partial', partial_lines, save_output)
+    save_image('hough', full_lines, save_output)
+
     return hough_lines
 
 
@@ -86,8 +87,7 @@ def convert_to_greyscale(image, save_output=True):
     """
     grey = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     grey = cv2.equalizeHist(grey)
-    if save_output:
-        cv2.imwrite('../pictures/output/grey.jpg', grey)
+    save_image('grey', grey, save_output)
     return grey
 
 
@@ -98,8 +98,7 @@ def apply_gaussian_blur(image, save_output=True):
     :param save_output:
     """
     gauss = cv2.GaussianBlur(image, (5, 5), 0)
-    if save_output:
-        cv2.imwrite('../pictures/output/gauss.jpg', gauss)
+    save_image('gauss', gauss, save_output)
     return gauss
 
 
@@ -111,8 +110,7 @@ def perform_opening(image, save_output=True):
     """
     kernel = np.ones((5, 5), np.uint8)
     opening = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel)
-    if save_output:
-        cv2.imwrite('../pictures/output/opening.jpg', opening)
+    save_image('opening', opening, save_output)
     return opening
 
 
@@ -123,8 +121,7 @@ def perform_canny(image, save_output=True):
     :param save_output:
     """
     edges = cv2.Canny(image, 40, 150, apertureSize=3)
-    if save_output:
-        cv2.imwrite('../pictures/output/canny.jpg', edges)
+    save_image('canny', edges, save_output)
     return edges
 
 
@@ -203,7 +200,7 @@ def find_vanishing_point_kmeans(img, intersections):
     largest_centroid = (0, 0)
     for c in centroids:
         points = df[df.apply(
-            lambda row: math.hypot(c[0] - row["x"], (c[1]- row["y"])) < 15, axis=1) == True]
+            lambda row: math.hypot(c[0] - row["x"], (c[1] - row["y"])) < 15, axis=1) == True]
         if len(points) > largest:
             largest = len(points)
             largest_centroid = c
@@ -219,6 +216,25 @@ def find_vanishing_point_kmeans(img, intersections):
     cv2.line(img, (x, y), (x, y), (0, 255, 0), 20)
 
     return x, y
+
+
+def save_image(name, image, should_save, location=None):
+    """
+    Save images, if they should be saved.
+    
+    :param name:
+    :param image:
+    :param should_save:
+    :param location:
+    :return:
+    """
+    if not should_save:
+        return
+    if location is None:
+        location = '../pictures/output/'
+
+    file_name = location + name + '.jpg'
+    cv2.imwrite(file_name, image)
 
 
 def find_vanishing_point(img, grid_size, intersections):
@@ -256,7 +272,7 @@ def find_vanishing_point(img, grid_size, intersections):
             best_cell = ((cell_left + cell_right) / 2, (cell_bottom + cell_top) / 2)
             print("Best Cell:", best_cell)
 
-    if best_cell[0] != None and best_cell[1] != None:
+    if best_cell[0] is not None and best_cell[1] is not None:
         rx1 = int(best_cell[0] - grid_size / 2)
         ry1 = int(best_cell[1] - grid_size / 2)
         rx2 = int(best_cell[0] + grid_size / 2)
