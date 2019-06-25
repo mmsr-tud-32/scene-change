@@ -1,4 +1,6 @@
 import argparse
+import random
+from glob import glob
 
 import cv2
 
@@ -9,20 +11,23 @@ from vanishing_point import resize_image
 def get_arguments():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('fg_path', help='Path to image containing foreground')
-    parser.add_argument('bg_path', help='Path to image containing background')
+    parser.add_argument('fg_path', help='Path to folder containing foreground')
+    parser.add_argument('bg_path', help='Path to folder containing background')
 
     return parser.parse_args()
 
 
 def composite_images(fg_path, bg_path):
-    foreground = resize_image(cv2.imread(fg_path, cv2.IMREAD_UNCHANGED), 512)
-    background = resize_image(cv2.imread(bg_path), 512)
-    foreground = fit_foreground(background, foreground)
+    while True:
+        fg_file = random.choice(glob(fg_path + '/*'))
+        bg_file = random.choice(glob(bg_path + '/*'))
 
-    cv2.imshow('merged', merge(foreground, background))
+        foreground = resize_image(cv2.imread(fg_file, cv2.IMREAD_UNCHANGED), 512)
+        background = resize_image(cv2.imread(bg_file), 512)
+        foreground = fit_foreground(background, foreground)
 
-    cv2.waitKey(0)
+        cv2.imshow('merged', merge(foreground, background))
+        cv2.waitKey(0)
 
 
 def fit_foreground(background, foreground):
