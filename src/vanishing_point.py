@@ -30,12 +30,17 @@ def hough_transform(img, save_output=True):
         filtered = {line for line in transformed if line is not None}
         hough_lines = list(filtered)
 
-    print(hough_lines)
-    for line in hough_lines:
-        endpoints = calculate_endpoints(line, img)
-        cv2.line(img, endpoints[0], endpoints[1], (0, 0, 255), 2)
+    partial_lines = img.copy()
+    for line in lines:
+        cv2.line(partial_lines, (line[0][0], line[0][1]), (line[0][2], line[0][3]), (0, 0, 255), 2)
 
-    cv2.imwrite('../pictures/output/hough.jpg', img)
+    cv2.imwrite('../pictures/output/partial.jpg', partial_lines)
+    full_lines = img.copy()
+    for line in hough_lines:
+        endpoints = calculate_endpoints(line, full_lines)
+        cv2.line(full_lines, endpoints[0], endpoints[1], (0, 0, 255), 1)
+
+    cv2.imwrite('../pictures/output/hough.jpg', full_lines)
     return hough_lines
 
 
@@ -46,15 +51,15 @@ def calculate_endpoints(line, image):
     :param image:
     :return:
     """
-    (slope, translation) = line[:2]
+    (slope, intercept) = line[:2]
     (height, width) = image.shape[:2]
-    return (0, int(np.round(translation))), (width, int(np.round(slope * width + translation)))
+    return (0, int(np.round(intercept))), (width, int(np.round(slope * width + intercept)))
 
 
 def transform_line(line):
     """
-    Transforms a line into an equation of its slope and its translation
-    y = slope * x + translation
+    Transforms a line into an equation of its slope and its intercept
+    y = slope * x + intercept
     :param line:
     :return:
     """
@@ -64,8 +69,8 @@ def transform_line(line):
     else:
         slope = (y2 - y1) / (x2 - x1)
 
-    translation = y1 - (slope * x1)
-    return slope, translation
+    intercept = y1 - (slope * x1)
+    return np.around(slope, 2), np.around(intercept, 2)
 
 
 def convert_to_greyscale(image, save_output=True):
@@ -152,13 +157,13 @@ def find_intersection_point(line1, line2):
     :param line2:
     :return: The x and y coordinates of the intersection, or None if the lines don't intersect
     """
-    (slope_1, translation_1) = line1[:2]
-    (slope_2, translation_2) = line2[:2]
+    (slope_1, intercept_1) = line1[:2]
+    (slope_2, intercept_2) = line2[:2]
     if slope_1 == slope_2:
         return None
 
-    x_coord = (translation_2 - translation_1) / (slope_1 - slope_2)
-    y_coord = slope_1 * x_coord + translation_1
+    x_coord = (intercept_2 - intercept_1) / (slope_1 - slope_2)
+    y_coord = slope_1 * x_coord + intercept_1
 
     return int(np.round(x_coord)), int(np.round(y_coord))
 
