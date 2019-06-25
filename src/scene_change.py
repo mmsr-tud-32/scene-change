@@ -120,21 +120,32 @@ def fix_alpha(with_alpha, without_alpha):
     return alpha_added
 
 
-def merge(foreground, background):
+def merge(foreground, background, offset=(0, 0)):
     """
     Given a background and a foreground, place the foreground
     on the background.
 
+    :param offset:
     :param foreground:
     :param background:
     :return:
     """
+
+    x_offset, y_offset = offset
     merged = background.copy()
-    for row_idx, row in enumerate(foreground):
-        for pixel_idx, pixel in enumerate(row):
+    (height, width, _) = merged.shape
+    for y_pos, row in enumerate(foreground):
+        if y_pos + y_offset >= height or y_pos + y_offset < 0:
+            continue
+
+        for x_pos, pixel in enumerate(row):
+            if x_pos + x_offset >= width or x_pos + x_offset < 0:
+                continue
+
             if pixel[3] == 0:
                 continue
-            merged[row_idx][pixel_idx] = pixel[:3]
+
+            merged[y_pos + y_offset][x_pos + x_offset] = pixel[:3]
 
     return merged
 
